@@ -1,5 +1,2 @@
 
-
-------------------------
-Configuring Galaxy Tools
-------------------------
+TODO: Describe installing Galaxy tools.
