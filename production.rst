@@ -1,17 +1,17 @@
 Splitting Galaxy into Multiple Processes
 ----------------------------------------
 
-CloudMan's default configuration launches just one Galaxy process. To
-really scale up the number of concurrent users Galaxy can handle it
+`CloudMan`_'s default configuration launches just one `Galaxy`_ process. To
+really scale up the number of concurrent users `Galaxy`_ can handle it
 must be split into multiple processes as outlined and documented `here
 <http://wiki.galaxyproject.org/Admin/Config/Performance/Web%20Application%20Scal
 ing>`_::
 
-     galaxy_conf_dir: /opt/galaxy/web/conf.d
+    galaxy_conf_dir: /opt/galaxy/web/conf.d
 
-     configure_multiple_galaxy_processes: True
-     web_thread_count: 2
-     handler_thread_count: 2
+    configure_multiple_galaxy_processes: True
+    web_thread_count: 2
+    handler_thread_count: 2
 
 When these options are enabled, CloudMan will rewrite the body of the
 ``upstream galaxy_app {...}`` to load balance web traffic accross the
@@ -20,13 +20,13 @@ processes job admin functionality needs to be routed to Galaxy's job
 manager, this can be done by updating your nginx.conf file to add the
 following ``location /admin/jobs`` subsection shown below::
 
-     location / {
-         ...
+    location / {
+        ...
 
-         location /admin/jobs {
-            proxy_pass  http://localhost:8079;
-         }
-     }
+        location /admin/jobs {
+           proxy_pass  http://localhost:8079;
+        }
+    }
 
 External Authentication (LDAP)
 ------------------------------
@@ -110,7 +110,7 @@ Your cloud security group will likely block port ``443`` by
 default. This must be opened.
 
 If you are using Amazon EC2, when following the instructions on the
-`CloudMan <http://wiki.galaxyproject.org/CloudMan>`_ wiki site, be sure
+`CloudMan wiki site <http://wiki.galaxyproject.org/CloudMan>`_, be sure
 to add the HTTPS inbound rule in addition to the HTTP one mentioned.
 
 Instructions for opening this port on private clouds will vary, the

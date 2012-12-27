@@ -1,36 +1,22 @@
 
-The core of this document relates to configuring various aspects of
-CloudMan/Galaxy geared toward large, long running production instances but
-first one needs to configure a CloudMan machine image. This section outlines
-how to do that both in an abstract way applicable for any cloud environment
-and then specially for OpenStack using the set of scripts used maintain to
-manage the CloudMan environment at MSI.
-
 There are a few key configuration files used to configure
-CloudBioLinux+CloudMan. These are
+`CloudBioLinux`_ + `CloudMan`_. These include:
 
 .. _fabricrc:
 
 ``fabricrc.txt``
 
-  Fabric properties used to configure `CloudBioLinux`. For examples see the
-  `CloudBioLinux default <https://github.com/chapmanb/cloudbiolinux/blob/maste
-  r/config/fabricrc.txt>`_ or the version used for `my CloudMan OpenStack
-  bootstrap scripts <https://github.com/jmchilton/cloudman_openstack_bootstrap
-  /blob/master/fabricrc.txt.sample>`_
+  `Fabric`_ properties used to configure `CloudBioLinux`_. For examples see the
+  `CloudBioLinux default <https://github.com/chapmanb/cloudbiolinux/blob/master/config/fabricrc.txt>`_ or the version used for `my CloudMan OpenStack bootstrap scripts <https://github.com/jmchilton/cloudman_openstack_bootstrap/blob/master/fabricrc.txt.sample>`_
 
 ``userData.yaml``
-
-  YAML configuration file used by `CloudMan` to configure your instance(s) at
+  YAML configuration file used by `CloudMan`_ to configure your instance(s) at
   startup.
 
 ``nginx.conf``
-
   Base configuration file for nginx_ server. See
   :ref:`configuring_nginx_conf` for description of how to replace the default
   contents of this file either at image build time or at instance boot time.
-
-.. _nginx: http://nginx.org/
 
 Checking Out CloudBioLinux
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -55,14 +41,10 @@ Installing CloudBioLinux
 
 In order to install CloudBioLinux, you will need to have the following done:
 
-- Customize a `fabricrc`_ file as described above (referred to as
-``/path/to/fabricrc.txt``). 
-- Launch a stock Ubuntu instance on your cloud platform with key-pairs and
-security groups so that the instance (``test1.example.org``) is accessible 
-via the private key ``/path/to/private_key``.
-- Mount needed file systems (likely at least `/mnt/galaxyData` and 
-`/mnt/galaxyTools`). The specifics of this is beyond the scope of this 
-document.
+- Customize a `fabricrc`_ file as described above (referred to as ``/path/to/fabricrc.txt``). 
+- Launch a stock Ubuntu instance on your cloud platform with key-pairs and security groups so that the instance (``test1.example.org``) is  accessible via the private key ``/path/to/private_key``.
+- Mount needed file systems (likely at least `/mnt/galaxyData` and `/mnt/galaxyTools`). The specifics of this is beyond the scope of this document.
+
 
 CloudMan Flavor
 +++++++++++++++
@@ -73,7 +55,7 @@ Once you have booted up an Ubuntu instance in your cloud environment,
     fab -u ubuntu -c /path/to/fabricrc.txt -i /path/to/private_key -H test1.example.org install_biolinux:flavor=cloudman
 
 This version of the install command is the simplest, and it will install some
-base packages and configure CloudMan. This is good for initial testing.
+base packages and configure `CloudMan`_. This is good for initial testing.
 Ultimately, though you will likely want to install needed bioinformatics
 applications also - the following two subsections describe two approaches to
 this.
@@ -145,8 +127,8 @@ Save the Image
 ~~~~~~~~~~~~~~
 
 The ``CloudBioLinux`` install will setup a script that get executed at
-startup, so to launch CloudMan save this image and boot it up with the
-required CloudMan userdata. Details of how to do this will vary between Cloud
+startup, so to launch `CloudMan`_ save this image and boot it up with the
+required `CloudMan`_ userdata. Details of how to do this will vary between Cloud
 platforms.
 
 
