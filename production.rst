@@ -28,20 +28,67 @@ following ``location /admin/jobs`` subsection shown below::
          }
      }
 
-
 External Authentication (LDAP)
 ------------------------------
 
-Galaxy requires a proxy web server (in our nginx) to enable external
-authentication. See TODO:link_nginx for an example of how to enable
-such authentication.
+Galaxy requires a proxy web server (in this case nginx) to enable external
+authentication. Nginx can be configured to use LDAP authentication by modifing
+nginx.conf as follows::
 
-Galaxy also must be configured to use the information that will be
-passed through by nginx. The method I have implemented for doing this,
-involves telling CloudMan to use a Galaxy configuration directory
-(TODO:link_to_pull_request) and then set the Galaxy options
-use_remote_user, remote_user_maildomain, remote_user_logout_href, and
-require_login appropriately.::
+1) Modify ``http`` section of ``nginx.conf`` with LDAP connection information.
+
+    http {
+
+        auth_ldap_url ldap://ldap.example.com/dc=example,dc=com?uid?sub?(objectClass=person);
+        #auth_ldap_binddn cn=nginx,ou=service,dc=example,dc=com;
+        #auth_ldap_binddn_passwd mYsUperPas55W0Rd         
+        #auth_ldap_group_attribute uniquemember; # default 'member'
+        #auth_ldap_group_attribute_is_dn on; # default on
+
+        ...
+
+    }
+
+2) Modify root location of ``nginx.conf`` to require authentication and pass
+``REMOTE_USER`` along to Galaxy.
+
+    location / {
+        auth_ldap_require valid_user;
+        auth_ldap "LDAP Auth Source Description";
+        proxy_set_header REMOTE_USER $remote_user;
+
+
+        proxy_pass  http://galaxy_app;
+        proxy_set_header   X-Forwarded-Host $host;
+        proxy_set_header   X-Forwarded-For  $proxy_add_x_forwarded_for;
+        proxy_set_header   X-URL-SCHEME https;
+
+      ...
+    }
+
+    # For API access, set REMOTE_USER if available so Galaxy
+    # session based requests are let through, if REMOTE_USER is not
+    # available pass the request through and let Galaxy determine
+    # if a key is present and valid.
+    location  /api {           
+        proxy_set_header REMOTE_USER $remote_user;
+        proxy_pass  http://galaxy_app;
+        proxy_set_header   X-Forwarded-Host $host;
+        proxy_set_header   X-Forwarded-For  $proxy_add_x_forwarded_for;
+    }
+
+
+Additionally, nginx needs to be compiled with LDAP support. This can be done
+while building a CloudBioLinux image, to enable this simply add the following
+option to your fabricrc file::
+
+    nginx_enable_module_ldap = true
+
+Finally, Galaxy also must be configured to use the information that will be
+passed through by nginx. The method outlined here to do this involves setting
+up a Galaxy configuration directory (TODO:link_to_pull_request) via CloudMan
+and then set the Galaxy options use_remote_user, remote_user_maildomain,
+remote_user_logout_href, and require_login appropriately.::
 
     galaxy_conf_dir: /opt/galaxy/web/conf.d
     galaxy_universe_use_remote_user: True
