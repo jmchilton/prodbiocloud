@@ -22,6 +22,8 @@ Appendix I: Getting Started with CloudBioLinux
 
 .. include:: getting_started.rst
 
+.. _configuring_nginx_conf:
+
 Appendix II: Configuring nginx.conf
 ----------------------------------------------
 
@@ -31,3 +33,4 @@ Appendix III: Configuring Galaxy Tools
 ----------------------------------------------
 
 .. include:: tools.rst
+

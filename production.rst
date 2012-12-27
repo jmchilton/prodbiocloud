@@ -33,24 +33,28 @@ External Authentication (LDAP)
 
 Galaxy requires a proxy web server (in this case nginx) to enable external
 authentication. Nginx can be configured to use LDAP authentication by modifing
-nginx.conf as follows::
+nginx.conf as follows.
 
-1) Modify ``http`` section of ``nginx.conf`` with LDAP connection information.
+Modify ``http`` section of ``nginx.conf`` with LDAP connection information.
+
+::
 
     http {
-
+    
         auth_ldap_url ldap://ldap.example.com/dc=example,dc=com?uid?sub?(objectClass=person);
         #auth_ldap_binddn cn=nginx,ou=service,dc=example,dc=com;
         #auth_ldap_binddn_passwd mYsUperPas55W0Rd         
         #auth_ldap_group_attribute uniquemember; # default 'member'
         #auth_ldap_group_attribute_is_dn on; # default on
-
+    
         ...
-
+    
     }
 
-2) Modify root location of ``nginx.conf`` to require authentication and pass
-``REMOTE_USER`` along to Galaxy.
+Modify root location of `nginx.conf` to require authentication and pass
+`REMOTE_USER` along to Galaxy.
+
+::
 
     location / {
         auth_ldap_require valid_user;
@@ -65,7 +69,7 @@ nginx.conf as follows::
 
       ...
     }
-
+    
     # For API access, set REMOTE_USER if available so Galaxy
     # session based requests are let through, if REMOTE_USER is not
     # available pass the request through and let Galaxy determine
@@ -77,10 +81,9 @@ nginx.conf as follows::
         proxy_set_header   X-Forwarded-For  $proxy_add_x_forwarded_for;
     }
 
-
 Additionally, nginx needs to be compiled with LDAP support. This can be done
 while building a CloudBioLinux image, to enable this simply add the following
-option to your fabricrc file::
+option to your ``fabricrc`` file::
 
     nginx_enable_module_ldap = true
 
@@ -192,14 +195,13 @@ etc...).::
 Running Jobs on External Compute Resources
 ------------------------------------------
 
-The method I will outline here involves the `LWR
-<https://lwr.readthedocs.org/>`_ job runner. The LWR job runner is a Galaxy
-job runner and corresponding server-side application that can run jobs a
-server remote to the Galaxy host but without requiring the same file systems
-to be mounted on both hosts. It does this by transferring all input files to
-the remote host, rewritting paths in the Galaxy command-line as well as
-``configfile``s, running the job remotely, and then transferring the outputs
-back to the Galaxy host upon completion.
+The method I will outline here involves the `LWR`_ job runner. 
+The LWR job runner is a Galaxy job runner and corresponding server-side
+application that can run jobs a server remote to the Galaxy host but without
+requiring the same file systems to be mounted on both hosts. It does this by
+transferring all input files to the remote host, rewritting paths in the
+Galaxy command-line as well as `configfile` s, running the job remotely, and
+then transferring the outputs back to the Galaxy host upon completion.
 
 This is being used at MSI to run jobs orginating from an ephermeral Galaxy
 host in our OpenStack cloud on a permant Windows host outside the cloud. This
@@ -217,8 +219,8 @@ remote LWR host, and https is used to secure transport. Please consult the LWR
 documentation and source for details.
 
 Backend implementations for LWR targetting DRMAA and/or PBS are being
-developed. Progress can be tracked by following the LWR on `Bitbucket
-<https://bitbucket.org/jmchilton/lwr>`_.
+developed. Progress can be tracked by following the LWR on 
+`Bitbucket <https://bitbucket.org/jmchilton/lwr>`_.
 
 An Aside
 ~~~~~~~~
@@ -238,3 +240,5 @@ to CloudMan at deploy time::
 At this point this is all untested speculation, but hopefully additional
 testing will be done and this documentation updated. If you have tried this
 and have advice `let me know <mailto:jmchilton@gmail.com>`_
+
+.. _LWR: https://lwr.readthedocs.org/
