@@ -1,3 +1,4 @@
+
 Splitting Galaxy into Multiple Processes
 ----------------------------------------
 
@@ -7,18 +8,27 @@ must be split into multiple processes as outlined and documented `here
 <http://wiki.galaxyproject.org/Admin/Config/Performance/Web%20Application%20Scal
 ing>`_::
 
-    galaxy_conf_dir: /opt/galaxy/web/conf.d
-
     configure_multiple_galaxy_processes: True
     web_thread_count: 2
     handler_thread_count: 2
+    galaxy_conf_dir: /mnt/galaxyTools/galaxy-central
 
-When these options are enabled, CloudMan will rewrite the body of the
-``upstream galaxy_app {...}`` to load balance web traffic accross the
-number of web threads you specify. However, when using multiple Galaxy
-processes job admin functionality needs to be routed to Galaxy's job
-manager, this can be done by updating your nginx.conf file to add the
-following ``location /admin/jobs`` subsection shown below::
+The first option (``configure_multiple_galaxy_processes``) informs `CloudMan`_
+to split `Galaxy`_ into multiple processes and ``web_thread_count`` and
+``handle_thread_count`` specifies how many web and handler threads to create
+(respectively). 
+
+The last option - ``galaxy_conf_dir`` - instructs `CloudMan`_ to setup a
+configuration for directory for `Galaxy`_ and is required for many of the
+options described in this document.
+
+When these options are enabled, `CloudMan`_ will rewrite the body of the
+``upstream galaxy_app {...}`` in ``nginx.conf`` to load balance web traffic
+accross the number of web threads you specify. However, when using multiple
+Galaxy processes job admin functionality needs to be routed to Galaxy's job
+manager, this can be done by updating your ``nginx.conf`` file (see
+:ref:`configure_nginx_conf`) to add the following ``location /admin/jobs``
+subsection (as shown below)::
 
     location / {
         ...
@@ -31,9 +41,9 @@ following ``location /admin/jobs`` subsection shown below::
 External Authentication (LDAP)
 ------------------------------
 
-Galaxy requires a proxy web server (in this case nginx) to enable external
-authentication. Nginx can be configured to use LDAP authentication by modifing
-nginx.conf as follows.
+Galaxy requires a proxy web server (in this case `nginx`_) to enable external
+authentication. `nginx`_ can be configured to use LDAP authentication by
+modifing ``nginx.conf`` (see :ref:`configure_nginx_conf`) as follows.
 
 Modify ``http`` section of ``nginx.conf`` with LDAP connection information.
 
@@ -51,8 +61,9 @@ Modify ``http`` section of ``nginx.conf`` with LDAP connection information.
     
     }
 
-Modify root location of `nginx.conf` to require authentication and pass
-`REMOTE_USER` along to Galaxy.
+Modify the root location (``/``) of ``nginx.conf`` to require authentication
+and pass ``REMOTE_USER`` along to `Galaxy`_ and create a (``/api``) to make
+this authentication optional.
 
 ::
 
@@ -81,45 +92,51 @@ Modify root location of `nginx.conf` to require authentication and pass
         proxy_set_header   X-Forwarded-For  $proxy_add_x_forwarded_for;
     }
 
-Additionally, nginx needs to be compiled with LDAP support. This can be done
-while building a CloudBioLinux image, to enable this simply add the following
-option to your ``fabricrc`` file::
+Additionally, `nginx`_ needs to be compiled with LDAP support. This should be
+done when building the cloud image with `CloudBioLinux`_. To enable this
+compilation simply add the following option to your `fabricrc`_ file::
 
     nginx_enable_module_ldap = true
 
-Finally, Galaxy also must be configured to use the information that will be
-passed through by nginx. The method outlined here to do this involves setting
-up a Galaxy configuration directory (TODO:link_to_pull_request) via CloudMan
-and then set the Galaxy options use_remote_user, remote_user_maildomain,
-remote_user_logout_href, and require_login appropriately.::
+Finally, `Galaxy`_ also must be configured to use the information that will be
+passed through by `nginx`_. ::
 
-    galaxy_conf_dir: /opt/galaxy/web/conf.d
     galaxy_universe_use_remote_user: True
     galaxy_universe_remote_user_maildomain: <domain_name (e.g. example.org)>
     galaxy_universe_remote_user_logout_href: https://logout@<galaxy_url>/
     galaxy_universe_require_login: True
 
-If you are using external authentication in this mannor it is also
-likely a good idea to enable SSL.
+Note, setting these properties requires also setting a ``galaxy_conf_dir``.
 
+More information about the `nginx`_ LDAP module can be found `here
+<https://github.com/kvspb/nginx-auth-ldap>`_. Interacting with other forms of
+external authentication will likely require compiling `nginx`_ with additional
+modules. Checkout out the functions ``_get_nginx_modules`` and
+``_get_nginx_module_ldap`` in
+`cloudbiolinux/master/cloudbio/galaxy/__init__.py <https://github.com/chapmanb
+/cloudbiolinux/blob/master/cloudbio/galaxy/__init__.py>`_ for an outline of
+how to do this.
+
+If you are using external authentication in this fashion it is also likely a
+good idea to enable SSL.
 
 Enable SSL
 ----------
 
-Your cloud security group will likely block port ``443`` by
+Your cloud account's security group will likely block port ``443`` by
 default. This must be opened.
 
-If you are using Amazon EC2, when following the instructions on the
-`CloudMan wiki site <http://wiki.galaxyproject.org/CloudMan>`_, be sure
-to add the HTTPS inbound rule in addition to the HTTP one mentioned.
+If you are using Amazon `EC2`_, when following the instructions on the
+`CloudMan wiki site <http://wiki.galaxyproject.org/CloudMan>`_, be sure to add
+the ``HTTPS`` inbound rule in addition to the ``HTTP`` one mentioned.
 
 Instructions for opening this port on private clouds will vary, the
-following command for instance will open it for OpenStack.::
+following command for instance will open it for `OpenStack`_.::
 
     nova secgroup-add-rule <security_group> tcp 443 443 0.0.0.0/0
 
-CloudMan will need to setup the desired SSL key and cert before nginx
-starts up. The CloudMan augmentations including::
+`CloudMan`_ will need to setup the desired SSL `key` and `cert` before `nginx`_
+starts up. The `CloudMan`_ can be configured to do this by passing them along as ``conf_files`` in the user data::
 
     conf_files:
        - path: /usr/nginx/conf/key
@@ -127,54 +144,64 @@ starts up. The CloudMan augmentations including::
        - path: /usr/nginx/conf/cert
          content: <base64 encoding of cert>
 
+TODO: Add nginx.
 
 Reports Server
 --------------
 
-The Galaxy reports webapp is a small webapp that runs in parallel to
-Galaxy and provides a wealth of valuable data on every job that Galaxy
-has run as well as disk usage accounting, etc....
+The `Galaxy`_ reports webapp is a small webapp that runs in parallel to
+`Galaxy`_ and provides a wealth of valuable data on every job that Galaxy has
+run as well as disk usage accounting, etc....
 
-CloudMan can now enable the reports application by simply adding it to
-the list of services.::
+`CloudMan`_ can now enable the reports application by simply adding it to the
+list of services.::
 
     services:
       - name: Galaxy
       - name: GalaxyReports
       - name: Postgres
 
+By default no services need to be specified in the user data and ``Galaxy``
+and ``Postgres`` are enabled. However, to add or remove any all desired
+services should be listed.
 
 External Postgres Server
 ------------------------
 
-When deploying to Amazon, running a Postgres server right on the
-CloudMan/Galaxy head node makes a lot of sense. But for private cloud
-deployments, many institutions may already have well optimized, well
-maintained production Postgres servers.
+When deploying to Amazon `EC2`_, running a Postgres server right on the
+`CloudMan`_ master node makes a lot of sense. For private cloud deployments
+many institutions may already have well optimized, well maintained production
+Postgres servers however and utilizing these may be preferable. This section
+describes how to utilize such a server.
 
-To disable the Postgres server, simply manually specify the list of
-services CloudMan should start and exclude Postgres. For instance::
+To disable `CloudMan`_'s default Postgres server, simply manually specify the
+list of services CloudMan should start and exclude Postgres. For instance::
 
     services:
       - name: Galaxy
       - name: GalaxyReports
 
-Then Galaxy must simply be configured to use your external postgres
-server, this can be done by passing it in via the userdata variable
-``galaxy_universe_database_connection``.::
+`Galaxy`_ must then simply be configured to use your external postgres server,
+this can be done by passing it in via the user-data variable
+``galaxy_universe_database_connection``.
+
+::
 
     galaxy_universe_database_connection: postgres://user:password@host:port/schema
 
+Setting the database connection in this fashion also requires specifing a
+``galaxy_conf_dir``.
 
 External File Server
 --------------------
 
-Two CloudMan user data options - ``master_prestart_commands`` and
+Two `CloudMan`_ user data options - ``master_prestart_commands`` and
 ``workder_prestart_commands`` - can be specified to run arbitrary shell
 commands before CloudMan starts up Galaxy on the master node or runs jobs on
 newly booted worker nodes.
 
-The following commands mount Galaxy's data partition from an NFS export on
+The following example demonstrates how this used at MSI. The following
+commands mount Galaxy's data partition from an NFS export on the host
 ``spider.msi.umn.edu`` and a read-only partition from an NFS export on
 ``buzzard.msi.umn.edu`` (we use the second to store bio data such NGS indices,
 etc...).::
@@ -189,8 +216,6 @@ etc...).::
       - "mount -t nfs4 -o sec=sys spider.msi.umn.edu:/export/galaxyp /mnt/galaxyData/"
       - "mkdir -p /project/db"
       - "mount -t nfs4 -o ro buzzard.msi.umn.edu:/zprod2/misc/db /project/db/"
-
-
 
 Running Jobs on External Compute Resources
 ------------------------------------------

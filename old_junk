@@ -1,0 +1,4 @@
+The method outlined here to do this involves setting
+up a Galaxy configuration directory (TODO:link_to_pull_request) via `CloudMan`_
+and then set the Galaxy options ``use_remote_user``, ``remote_user_maildomain``,
+``remote_user_logout_href``, and ``require_login appropriately``.

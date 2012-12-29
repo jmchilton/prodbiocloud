@@ -3,6 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+.. TODO: Normalize user-data references
+
 ========================================================================
 Production Galaxy Instances with CloudMan and CloudBioLinux
 ========================================================================
@@ -12,7 +14,7 @@ Production Galaxy Instances with CloudMan and CloudBioLinux
 .. _CloudMan: https://bitbucket.org/galaxy/cloudman/
 .. _CloudBioLinux: https://github.com/chapmanb/cloudbiolinux/
 .. _nginx: http://nginx.org/
-
+.. _OpenStack: http://www.openstack.org/
 
 Introduction
 ------------
@@ -43,6 +45,7 @@ Appendix I: Getting Started with `CloudBioLinux`_
 .. include:: getting_started.rst
 
 .. _configuring_nginx_conf:
+.. _`nginx.conf`:
 
 Appendix II: Configuring nginx.conf
 ----------------------------------------------
