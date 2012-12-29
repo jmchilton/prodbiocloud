@@ -21,15 +21,15 @@ There are a few key configuration files used to configure
 Checking Out CloudBioLinux
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-One can use ``git`` to checkout ``CloudBioLinux``.
+``git`` should be used obtain ``CloudBioLinux``.
 
 ::
 
-    git://github.com/chapmanb/cloudbiolinux.git
+    git clone git://github.com/chapmanb/cloudbiolinux.git
 
-If you forsee considerable CloudBioLinux development (installation of custom
-packages, services, etc...), you will likly want to `fork CloudBioLinux`__ first and then
-checkout your own copy.
+If additional CloudBioLinux development is planned (installation of custom
+packages, services, etc...), it may be preferable to `fork CloudBioLinux`__ first and then
+checkout `CloudBioLinux`_ from the forked repository.
 
 __ fork_Cloudbiolinux_
 
@@ -39,12 +39,14 @@ __ fork_Cloudbiolinux_
 Installing CloudBioLinux
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-In order to install CloudBioLinux, you will need to have the following done:
+Prerequistes for installing `CloudBioLinux`_ include the following:
 
 - Customize a `fabricrc`_ file as described above (referred to as ``/path/to/fabricrc.txt``). 
 - Launch a stock Ubuntu instance on your cloud platform with key-pairs and security groups so that the instance (``test1.example.org``) is  accessible via the private key ``/path/to/private_key``.
-- Mount needed file systems (likely at least `/mnt/galaxyData` and `/mnt/galaxyTools`). The specifics of this is beyond the scope of this document.
+- Mount needed file systems (likely at least `/mnt/galaxyData` and `/mnt/galaxyTools`).
 
+The specifics of these steps are beyond the scope of this document and will
+vary from setup to setup.
 
 CloudMan Flavor
 +++++++++++++++
@@ -57,8 +59,8 @@ Once you have booted up an Ubuntu instance in your cloud environment,
 This version of the install command is the simplest, and it will install some
 base packages and configure `CloudMan`_. This is good for initial testing.
 Ultimately, though you will likely want to install needed bioinformatics
-applications also - the following two subsections describe two approaches to
-this.
+applications also - the following two subsections describe approaches to
+accomplish this.
 
 Flavorless
 ++++++++++
@@ -67,17 +69,18 @@ Flavorless
 
     fab -u ubuntu -c /path/to/fabricrc.txt -i /path/to/private_key -H test1.example.org install_biolinux
 
-The second version of the install_biolinux command (no flavor specified) will
-install all of ``CloudBioLinux``, which will include many packages you may not
-need for Galaxy, such as R libraries and desktop packages.
+This second version of the ``install_biolinux`` command (no flavor specified)
+will install all of `CloudBioLinux`_, which will include many packages you
+may not need for Galaxy, such as R libraries and desktop applications.
 
-These packages will be installed into the image's /usr partition, either using
-fabric commands defined in ``cloudbiolinux/cloudbio/custom`` or using native pacakges.
+These packages will be installed into the instance's ``/usr`` directory,
+either using fabric commands defined in ``cloudbiolinux/cloudbio/custom`` or
+native pacakges.
 
-If all of ``CloudBioLinux`` is not desired, one can comment out lines in
-``cloudbiolinux/config/main.yaml`` and ``cloudbiolinux/config/custom.yaml``
-and other files in that directory to prune the list of things that get
-installed.
+If installing all of `CloudBioLinux`_ is not desired, one can comment out
+lines in ``cloudbiolinux/config/main.yaml`` and
+``cloudbiolinux/config/custom.yaml`` and other files in that directory to
+prune the list of applications and libraries that get installed.
 
 CloudMan + Tools Flavor
 +++++++++++++++++++++++
@@ -96,18 +99,16 @@ dependency directories
 required ``default`` symbolic links and ``env.sh`` files. To install
 CloudBioLinux this way, the following command can be used:
 
-Update the target `fabricrc`_ file to install Galaxy dependencies.
+::
+
+    fab -u ubuntu -c /path/to/fabricrc.txt -i /path/to/private_key -H test1.example.org install_biolinux:flavor=cloudman_and_galaxy
+
+This approach also requires updating the target `fabricrc`_ file to instruct
+`CloudBioLinux`_ to install Galaxy dependencies.
 
 ::
 
     galaxy_install_dependencies = true
-
-
-Install `CloudBioLinux`_ using the ``cloudman_and_galaxy`` flavor.
-
-::
-
-    fab -u ubuntu -c /path/to/fabricrc.txt -i /path/to/private_key -H test1.example.org install_biolinux:flavor=cloudman_and_galaxy
 
 The list of tools and versions that is installed can be found in
 ``cloudbiolinux/contrib/flavor/cloudman/tools.yaml <https://github.com/chapman
@@ -118,7 +119,7 @@ modify that file directly or specify an entirely new file by setting the
 *Warning*: Installing Galaxy tools in this manor is not as well supported as the
 full `CloudBioLinux`_ approach. This approach is my (John Chilton) pet
 project, and my day job is proteomics not genomics so many of the tools are
-suitable for Galaxy circa mid-2012, not an updated Galaxy with Cufflinks 2,
+suitable for `Galaxy`_ circa mid-2012, not an updated `Galaxy`_ with Cufflinks 2,
 Tophat 2, etc.... I am happy to accept pull requests to integrate newer
 versions of these tools however.
 
