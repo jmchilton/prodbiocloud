@@ -247,29 +247,33 @@ etc...).
 Running Jobs on External Compute Resources
 ------------------------------------------
 
-The method outlined here involves the `LWR`_ job runner.  The `LWR`_ job
+The method outlined here utilizes the `LWR`_ job runner.  The `LWR`_ job
 runner is a `Galaxy`_ job runner and corresponding server-side application
-that can run jobs a remote server but without requiring the same file systems
-to be mounted on both hosts. It does this by transferring all input files to
-the remote host, rewritting paths in the Galaxy command-line as well as
-`configfile` s, running the job remotely, and then transferring the outputs
-back to the Galaxy host upon completion.
+that can run jobs a remote server *without* requiring Galaxy filesystems be
+mounted on the remote host (as is required by DRMAA or PBS submissions). 
 
-This is being used at the Minnesota Supercomputing Institute to run jobs
-orginating from an ephermeral `Galaxy`_ host in our `OpenStack`_ cloud on a
-permant Windows host outside the cloud. This is a useful tool for purchased
-node-locked and/or Windows only software.
+The LWR_ works by transferring all input files to the remote host, rewritting
+paths in the Galaxy command-line as well as ``configfile``s, running the job
+remotely, and then transferring the outputs back to the Galaxy host upon
+completion.
 
-In order to support this use case, CloudMan has been augmented to allow
-specifing tool runner URLs via user data. The following piece of userdata is used
-to tell CloudMan to configure Galaxy to run ``proteinpilot`` jobs on the
-remote Windows host ``cobalt.msi.umn.edu`` using the LWR job runner.::
+This is being used at the Minnesota Supercomputing Institute to ship select
+jobs originating from an ephermeral `Galaxy`_ host in our `OpenStack`_ cloud
+to a permant Windows host outside the cloud. This is a useful tool for
+purchased node-locked and/or Windows only software.
+
+In order to support this use case, `CloudMan`_ has been augmented to allow
+specifing tool runner URLs via user data. The following userdata option is
+used to tell `CloudMan`_ to configure Galaxy to run ``proteinpilot`` jobs on
+the remote Windows host ``cobalt.msi.umn.edu`` using the LWR job runner.::
 
     galaxy_tool_runner_proteinpilot: "lwr://https://secretkey123@cobalt.msi.umn.edu:8913"
 
 The secret key seen here is used to authorize Galaxy to submit jobs to the
 remote LWR host, and https is used to secure transport. Please consult the LWR
-documentation and source for details.
+documentation and source for details. Specifing job runners this way requires
+setting the ``galaxy_conf_dir`` option as well (eee
+:ref:`configuration_directory`).
 
 Backend implementations for `LWR`_ targetting DRMAA and PBS are being
 developed. Progress can be tracked by following the LWR on 
@@ -279,19 +283,20 @@ An Aside
 ~~~~~~~~
 
 It MAY well be possible to configure Galaxy's standard job runner to submit
-Galaxy jobs directly from say a cloud host to a traditional, if all of the
-file systems are mounted similarly and the remote server has a user that can
-run jobs with pid 1001 (the CloudBioLinux generated pid for Galaxy).
+Galaxy jobs directly from say a cloud host to a traditional, *if* all of the
+filesystems are mounted similarly between the Cloud and compute hosts and the
+remote compute server has a user that can run jobs with pid 1001 (the
+CloudBioLinux generated pid for Galaxy).
 
 If this does work, one could imagine running jobs of type ``tool_x`` via the
 PBS host on ``compute.example.com`` by passing along the following user data
-to CloudMan at deploy time::
+to `CloudMan`_ at deploy time::
 
     galaxy_universe_start_job_runners = drmaa, pbs  # Make sure drmaa is still enabled for Cloud-targetted job
     galaxy_tool_runner_tool_x = pbs://compute.example.com/
 
 At this point this is all untested speculation, but hopefully additional
-testing will be done and this documentation updated. If you have tried this
-and have advice `let me know <mailto:jmchilton@gmail.com>`_
+testing will be done and this documentation updated. (If you have tried this
+and have advice `let me know <mailto:jmchilton@gmail.com>`_)
 
 .. _LWR: https://lwr.readthedocs.org/

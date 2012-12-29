@@ -1,4 +1,3 @@
-
 Creating a cloud instance the user data option ``galaxy_conf_dir`` will
 instruct `CloudMan`_ to launch `Galaxy`_ with the environment variable
 ``GALAXY_UNIVERSE_CONFIG_DIR`` set to the value specified by

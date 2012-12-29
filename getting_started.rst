@@ -5,12 +5,11 @@ There are a few key configuration files used to configure
 .. _fabricrc:
 
 ``fabricrc.txt``
-
   `Fabric`_ properties used to configure `CloudBioLinux`_. For examples see the
-  `CloudBioLinux default <https://github.com/chapmanb/cloudbiolinux/blob/master/config/fabricrc.txt>`_ or the version used for `my CloudMan OpenStack bootstrap scripts <https://github.com/jmchilton/cloudman_openstack_bootstrap/blob/master/fabricrc.txt.sample>`_
+  `CloudBioLinux default <https://github.com/chapmanb/cloudbiolinux/blob/master/config/fabricrc.txt>`_ or the version used for my `CloudMan OpenStack bootstrap scripts <https://github.com/jmchilton/cloudman_openstack_bootstrap/blob/master/fabricrc.txt.sample>`_
 
 ``userData.yaml``
-  YAML configuration file used by `CloudMan`_ to configure your instance(s) at
+  A YAML configuration file used by `CloudMan`_ to configure your instance(s) at
   startup.
 
 ``nginx.conf``
@@ -27,7 +26,7 @@ Checking Out CloudBioLinux
 
     git clone git://github.com/chapmanb/cloudbiolinux.git
 
-If additional CloudBioLinux development is planned (installation of custom
+If additional `CloudBioLinux`_ development is planned (installation of custom
 packages, services, etc...), it may be preferable to `fork CloudBioLinux`__ first and then
 checkout `CloudBioLinux`_ from the forked repository.
 
@@ -41,12 +40,14 @@ Installing CloudBioLinux
 
 Prerequistes for installing `CloudBioLinux`_ include the following:
 
-- Customize a `fabricrc`_ file as described above (referred to as ``/path/to/fabricrc.txt``). 
-- Launch a stock Ubuntu instance on your cloud platform with key-pairs and security groups so that the instance (``test1.example.org``) is  accessible via the private key ``/path/to/private_key``.
-- Mount needed file systems (likely at least `/mnt/galaxyData` and `/mnt/galaxyTools`).
+- A customized `fabricrc`_ file as described above (referred to as ``/path/to/fabricrc.txt``). 
+- A running Ubuntu instance on your cloud platform. This document assumes key-pairs and security groups so that the instance (``test1.example.org``) is accessible via the private key ``/path/to/private_key``.
+- Required filesytem mounts (likely at least `/mnt/galaxyData` and `/mnt/galaxyTools`).
 
 The specifics of these steps are beyond the scope of this document and will
 vary from setup to setup.
+
+.. TODO: Find a good link for this
 
 CloudMan Flavor
 +++++++++++++++
@@ -58,6 +59,7 @@ Once you have booted up an Ubuntu instance in your cloud environment,
 
 This version of the install command is the simplest, and it will install some
 base packages and configure `CloudMan`_. This is good for initial testing.
+
 Ultimately, though you will likely want to install needed bioinformatics
 applications also - the following two subsections describe approaches to
 accomplish this.
@@ -86,12 +88,12 @@ CloudMan + Tools Flavor
 +++++++++++++++++++++++
 
 As mentioned above, the flavorless install will install all packages into
-/usr. This allows applications other than Galaxy to utilize these programs,
+``/usr``. This allows applications other than Galaxy to utilize these programs,
 but this has down sides. 
 
-Galaxy's path grows quite complex, always having all programs on it. Galaxy
-cannot easily target multiple versions of the same program with different tool
-wrappers. 
+With every program on Galaxy's path by default, it may be difficult to isolate
+certain types of problems. More importantly however, Galaxy cannot then easily
+target multiple versions of the same program with different tool wrappers.
 
 ``CloudBioLinux`` can install specific Galaxy tools into a Galaxy `tool
 dependency directories
@@ -127,10 +129,9 @@ versions of these tools however.
 Save the Image
 ~~~~~~~~~~~~~~
 
-The ``CloudBioLinux`` install will setup a script that get executed at
-startup, so to launch `CloudMan`_ save this image and boot it up with the
-required `CloudMan`_ userdata. Details of how to do this will vary between Cloud
-platforms.
-
+The `CloudBioLinux`_ install will setup a script that get executed at instance
+startup to launch `CloudMan`_. So the next step is to save this image and boot
+it up with the required `CloudMan`_ userdata. Details of how to do this will
+vary between Cloud platforms.
 
 .. _fabric: http://docs.fabfile.org/
